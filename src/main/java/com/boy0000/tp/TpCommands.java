@@ -20,8 +20,8 @@ public class TpCommands implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (sender instanceof Player) {
-            if (label.equalsIgnoreCase("tpa") && !args[0].isEmpty()) {
+        if (sender instanceof Player && args.length == 1) {
+            if (label.equalsIgnoreCase("tpa")) {
                 Player player = Bukkit.getPlayer(args[0]);
                 final Player requester = (Player) sender;
                 if (Bukkit.getOnlinePlayers().contains(player)) {
@@ -39,7 +39,8 @@ public class TpCommands implements CommandExecutor {
 
                 } else sender.sendMessage(ChatColor.RED + "This player is not online!");
                 return true;
-            } else if (label.equalsIgnoreCase("tpaccept")) {
+            }
+            else if (label.equalsIgnoreCase("tpaccept")) {
                 final Player player = (Player) sender;
                 if (!tpMap.containsValue(player.getUniqueId())) {
                     player.sendMessage(ChatColor.RED + "You have no pending teleport requests!");
@@ -47,9 +48,11 @@ public class TpCommands implements CommandExecutor {
                 }
 
                 for (Map.Entry<UUID, UUID> entry : tpMap.entrySet()) {
-                    if (entry.getValue() == player.getUniqueId()) {
-                        Player requester = Bukkit.getPlayer(entry.getKey());
+                    Player requester = Bukkit.getPlayer(args[0]);
+                    if (entry.getValue() == player.getUniqueId() && entry.getKey() == requester.getUniqueId()) {
                         if (Bukkit.getOnlinePlayers().contains(requester)) {
+                            if (requester != Bukkit.getPlayer(args[0])) continue;
+
                             PlayerTeleportEvent event = new PlayerTeleportEvent(requester, requester.getLocation(), player.getLocation());
                             event.callEvent();
                             if (event.isCancelled()) {
@@ -67,24 +70,28 @@ public class TpCommands implements CommandExecutor {
                         tpMap.remove(requester.getUniqueId(), player.getUniqueId());
                         break;
                     }
+                    else player.sendMessage(ChatColor.RED + "You have no pending request from this player!");
                 }
-            } else if (label.equalsIgnoreCase("tpdeny")) {
+            }
+            else if (label.equalsIgnoreCase("tpdeny")) {
                 final Player player = (Player) sender;
+                Player requester = Bukkit.getPlayer(args[0]);
                 if (!tpMap.containsValue(player.getUniqueId())) {
                     player.sendMessage(ChatColor.RED + "You have no pending teleport requests!");
                     return true;
                 }
 
                 for (Map.Entry<UUID, UUID> entry : tpMap.entrySet()) {
-                    if (entry.getValue() == player.getUniqueId()) {
-                        Player requester = Bukkit.getPlayer(entry.getKey());
+                    if (entry.getValue() == player.getUniqueId() && entry.getKey() == requester.getUniqueId()) {
                         tpMap.remove(requester.getUniqueId(), player.getUniqueId());
                         requester.sendMessage(ChatColor.RED + player.getName() + " denied your teleport request");
                         player.sendMessage(ChatColor.RED + "You denied a teleport request from " + requester.getName());
                     }
+                    else player.sendMessage(ChatColor.RED + "You have no pending request from this player!");
                 }
             } else sender.sendMessage(ChatColor.RED + "Only players can execute this command!");
             return true;
-        } return true;
+        }
+        else return false;
     }
 }
