@@ -1,0 +1,13 @@
+name: TP
+version: '${version}'
+main: com.boy0000.tp.TpPlugin
+api-version: 1.18
+load: STARTUP
+
+commands:
+  tpa:
+    description: Sends a teleport request to another player
+  tpaccept:
+    description: Accepts a teleport request from another player
+  tpdeny:
+    description: Denies a teleport request from another player
