@@ -7,7 +7,10 @@ load: STARTUP
 commands:
   tpa:
     description: Sends a teleport request to another player
+    permission: tp.tpa
   tpaccept:
     description: Accepts a teleport request from another player
+    permission: tp.accept
   tpdeny:
     description: Denies a teleport request from another player
+    permission: tp.deny
